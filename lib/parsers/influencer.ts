@@ -1,8 +1,8 @@
 import { load } from 'cheerio';
-import type { CountryConfig } from '../countries';
-import { notFound } from '../errors';
-import type { InfluencerProfileData, Product } from '../types';
-import { absoluteUrl, asinFromHref, clean, firstAttr, firstText, parseCount } from './helpers';
+import type { CountryConfig } from '../countries.js';
+import { notFound } from '../errors.js';
+import type { InfluencerProfileData, Product } from '../types.js';
+import { absoluteUrl, asinFromHref, clean, firstAttr, firstText, parseCount } from './helpers.js';
 
 export function parseInfluencerProfile(
   html: string,
