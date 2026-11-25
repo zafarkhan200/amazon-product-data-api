@@ -1,7 +1,7 @@
 import type { MiddlewareHandler } from 'hono';
-import type { AppEnv, PlanName } from './app-env';
-import { rateLimited } from './errors';
-import { storeIncrementWindow } from './store';
+import type { AppEnv, PlanName } from './app-env.js';
+import { rateLimited } from './errors.js';
+import { storeIncrementWindow } from './store.js';
 
 /** Requests per second, per consumer (PRD section 8.3). */
 export const PLAN_LIMITS: Record<PlanName, number> = {
