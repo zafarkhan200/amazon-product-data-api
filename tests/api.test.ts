@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import app from '../lib/app';
-import { buildCacheKey } from '../lib/cache';
+import app from '../lib/app.js';
+import { buildCacheKey } from '../lib/cache.js';
 
 const savedEnv = { ...process.env };
 
