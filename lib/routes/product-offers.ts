@@ -28,6 +28,20 @@ productOffersRoutes.get('/', (c) =>
         .replace(/\s+/g, ' ')
         .trim()
         .slice(0, 160);
+      const offersVisibleText = offersHtml
+        .replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi, ' ')
+        .replace(/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi, ' ')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;|&#160;/gi, ' ')
+        .replace(/&amp;/gi, '&')
+        .replace(/&quot;|&#34;/gi, '"')
+        .replace(/&#39;|&apos;/gi, "'")
+        .replace(/\\s+/g, ' ')
+        .trim();
+      const noOffersMatch = /no featured offers|no offers available|currently unavailable/i.exec(offersVisibleText);
+      const noOffersContext = noOffersMatch
+        ? offersVisibleText.slice(Math.max(0, noOffersMatch.index - 220), noOffersMatch.index + 380).slice(0, 600)
+        : null;
       console.info('[offers] upstream page diagnostics', {
         status: offersPage.status,
         htmlLength: offersHtml.length,
@@ -38,7 +52,8 @@ productOffersRoutes.get('/', (c) =>
         hasOlpOffer: /class=["'][^"']*olpOffer/i.test(offersHtml),
         hasOfferListing: /offer-listing|offerlist/i.test(offersHtml),
         hasCaptcha: /captcha|robot check|validateCaptcha/i.test(offersHtml.slice(0, 60000)),
-        hasNoOffersMessage: /no featured offers|no offers available|currently unavailable/i.test(offersHtml),
+        hasNoOffersMessage: Boolean(noOffersMatch),
+        noOffersContext,
       });
       return parseOffers(offersHtml, country, params.page, params.limit, product);
     },
