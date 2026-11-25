@@ -94,7 +94,7 @@ async function fetchOnce(
       });
     }
 
-    return { html, url: targetUrl, status: response.status };
+    return { html, url: response.url || targetUrl, status: response.status };
   } finally {
     void dispatcher?.close();
   }
