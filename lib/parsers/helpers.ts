@@ -115,7 +115,7 @@ export function parseRating(raw: string | undefined): number | undefined {
 
 export function asinFromHref(href: string | undefined): string | undefined {
   if (!href) return undefined;
-  const match = href.match(/(?:\/dp\/|\/gp\/product\/|\/product\/)([A-Z0-9]{10})(?:[\/?#]|$)/i);
+  const match = href.match(/(?:\/dp\/|\/gp\/product\/|\/product\/|\/clp\/)([A-Z0-9]{10})(?:[\/?#]|$)/i);
   if (match) return match[1]!.toUpperCase();
   const bare = href.match(/(?:asin[=/:]|[?&]asin=)([A-Z0-9]{10})(?:[^A-Z0-9]|$)/i);
   return bare ? bare[1]!.toUpperCase() : undefined;
