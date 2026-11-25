@@ -193,6 +193,19 @@ export async function fetchAmazonReviewsData(
     throw upstreamUnavailable('ZenRows did not return structured Amazon review data');
   }
 
-  return parsed as Record<string, unknown>;
+  // Log only schema diagnostics (never review text, names, URLs, or API credentials).
+  const parsedRecord = parsed as Record<string, unknown>;
+  const customerReviews = parsedRecord.customer_reviews;
+  console.info('[reviews] ZenRows extraction summary', {
+    parsedKeys: Object.keys(parsedRecord),
+    customerReviewsIsArray: Array.isArray(customerReviews),
+    customerReviewsCount: Array.isArray(customerReviews) ? customerReviews.length : null,
+    firstReviewKeys:
+      Array.isArray(customerReviews) && customerReviews[0] && typeof customerReviews[0] === 'object'
+        ? Object.keys(customerReviews[0] as Record<string, unknown>)
+        : [],
+  });
+
+  return parsedRecord;
 }
 
