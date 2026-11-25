@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
-import type { AppEnv } from '../app-env';
-import { TTL } from '../cache';
-import { fetchAmazonPage } from '../fetcher';
-import { parseReviews } from '../parsers/reviews';
-import { reviewsInputSchema, reviewsOutputSchema } from '../schemas';
-import { reviewsPath } from '../urls';
-import { dataResponse } from './shared';
+import type { AppEnv } from '../app-env.js';
+import { TTL } from '../cache.js';
+import { fetchAmazonPage } from '../fetcher.js';
+import { parseReviews } from '../parsers/reviews.js';
+import { reviewsInputSchema, reviewsOutputSchema } from '../schemas.js';
+import { reviewsPath } from '../urls.js';
+import { dataResponse } from './shared.js';
 
 export const productReviewsRoutes = new Hono<AppEnv>();
 
