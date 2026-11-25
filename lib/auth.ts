@@ -1,6 +1,6 @@
 import type { MiddlewareHandler } from 'hono';
-import { forbidden } from './errors';
-import type { AppEnv, PlanName } from './app-env';
+import { forbidden } from './errors.js';
+import type { AppEnv, PlanName } from './app-env.js';
 
 const PLANS: PlanName[] = ['BASIC', 'PRO', 'ULTRA', 'MEGA'];
 
