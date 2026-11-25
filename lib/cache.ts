@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { storeGet, storeSet } from './store';
+import { storeGet, storeSet } from './store.js';
 
 /** TTLs from PRD section 11, in seconds. */
 export const TTL = {
