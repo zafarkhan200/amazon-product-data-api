@@ -96,7 +96,7 @@ export function parseOffers(
       shipping,
       delivery_date: deliveryDate,
       condition: firstText(row, ['#aod-offer-heading', '.aod-condition', '.olpCondition', '.a-color-secondary']),
-      is_fba: /fulfilled by amazon|ships from amazon(?:\\.com)?/i.test(rowText),
+      is_fba: /fulfilled by amazon|ships from amazon(?:\.com)?/i.test(rowText),
       is_prime: /\bprime\b/i.test(rowText),
       url:
         firstAttr(row, ['a[href*="/dp/"]'], 'href') ??
