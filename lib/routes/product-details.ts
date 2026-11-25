@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
-import type { AppEnv } from '../app-env';
-import { TTL } from '../cache';
-import { fetchAmazonPage } from '../fetcher';
-import { parseProductDetails } from '../parsers/product';
-import { asinInputSchema, productDetailsOutputSchema } from '../schemas';
-import { productPath } from '../urls';
-import { dataResponse } from './shared';
+import type { AppEnv } from '../app-env.js';
+import { TTL } from '../cache.js';
+import { fetchAmazonPage } from '../fetcher.js';
+import { parseProductDetails } from '../parsers/product.js';
+import { asinInputSchema, productDetailsOutputSchema } from '../schemas.js';
+import { productPath } from '../urls.js';
+import { dataResponse } from './shared.js';
 
 export const productDetailsRoutes = new Hono<AppEnv>();
 
