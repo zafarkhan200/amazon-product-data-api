@@ -109,7 +109,9 @@ export function parseOffers(
 
   return {
     product,
-    offers: deduped.slice((page - 1) * limit, page * limit),
+    // The AOD AJAX endpoint returns the requested page already. Do not slice it again;
+    // doing so makes page 2+ appear empty when Amazon returns (for example) 10 rows.
+    offers: deduped,
     total_offers: parseCount(totalText) ?? deduped.length,
     page,
     limit,
