@@ -94,7 +94,9 @@ async function fetchOnce(
       });
     }
 
-    return { html, url: response.url || targetUrl, status: response.status };
+    // A scraper-provider response URL points to the provider endpoint, not Amazon.
+    // Keep the requested Amazon URL in template mode to avoid leaking provider credentials.
+    return { html, url: options.template ? targetUrl : (response.url || targetUrl), status: response.status };
   } finally {
     void dispatcher?.close();
   }
