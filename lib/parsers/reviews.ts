@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto';
 import type { CheerioAPI } from 'cheerio';
 import { load } from 'cheerio';
-import type { CountryConfig } from '../countries';
-import type { Review } from '../types';
-import { absoluteUrl, allTexts, clean, firstAttr, firstText, parseCount, parseRating } from './helpers';
+import type { CountryConfig } from '../countries.js';
+import type { Review } from '../types.js';
+import { absoluteUrl, allTexts, clean, firstAttr, firstText, parseCount, parseRating } from './helpers.js';
 
 export function parseReviewCards($: CheerioAPI, country: CountryConfig, selector: string): Review[] {
   const reviews: Review[] = [];
