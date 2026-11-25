@@ -25,23 +25,25 @@ export function parseOffers(
   }
 
   const offers: Offer[] = [];
-  $('div[data-aod-offer-id], .aod-offer, #aod-new-table tr.aod-offer, div.olpOffer').each((_, element) => {
+  $('#aod-offer, div[data-aod-offer-id], .aod-offer, #aod-new-table tr.aod-offer, div.olpOffer').each((_, element) => {
     const row = $(element);
     const rowText = clean(row.text());
     const price =
       priceFrom(
         row,
-        ['.a-price .a-offscreen', '.olpOfferPrice', 'span.a-color-base', '.a-price-whole'],
+        ['.a-price .aok-offscreen', '.a-price .a-offscreen', '.olpOfferPrice', 'span.a-color-base', '.a-price-whole'],
         country.currency,
       ) ?? undefined;
     const seller = firstText(row, [
+      '#aod-offer-soldBy a',
+      '#aod-offer-soldBy',
       '.aod-offer-seller .a-color-base',
       '.aod-offer-soldBy',
       '.olpSellerName',
       '.aod-offer-seller a',
     ]);
-    const shipping = firstText(row, ['.aod-offer-shipping', '.olpShippingInfo']);
-    const deliveryDate = firstText(row, ['.aod-delivery-date', '.olpDeliveryDate']);
+    const shipping = firstText(row, ['#aod-offer-shipsFrom', '.aod-offer-shipping', '.olpShippingInfo']);
+    const deliveryDate = firstText(row, ['#aod-offer-delivery', '.aod-delivery-date', '.olpDeliveryDate']);
     const sellerFeedback =
       firstAttr(
         row,
@@ -56,7 +58,7 @@ export function parseOffers(
       price,
       shipping,
       delivery_date: deliveryDate,
-      condition: firstText(row, ['.aod-condition', '.olpCondition', '.a-color-secondary']),
+      condition: firstText(row, ['#aod-offer-heading', '.aod-condition', '.olpCondition', '.a-color-secondary']),
       is_fba: /fulfilled by amazon/i.test(rowText),
       is_prime: /\bprime\b/i.test(rowText),
       url:
@@ -66,7 +68,7 @@ export function parseOffers(
   });
 
   const deduped = dedupeBy(offers, (offer) => `${offer.seller ?? ''}|${offer.price?.value ?? ''}`);
-  const totalText = firstText($, ['#aod-offer-count', '#olp-upd-new', '.aod-offer-count']);
+  const totalText = firstAttr($, ['#aod-total-offer-count'], 'value') ?? firstText($, ['#aod-offer-count', '#olp-upd-new', '.aod-offer-count']);
 
   return {
     product,
