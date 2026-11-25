@@ -1,13 +1,13 @@
 import { load } from 'cheerio';
 import { Hono } from 'hono';
-import type { AppEnv } from '../app-env';
-import { TTL } from '../cache';
-import { fetchAmazonPage } from '../fetcher';
-import { clean, firstText } from '../parsers/helpers';
-import { parseProductCards } from '../parsers/search';
-import { promoCodeInputSchema, promoCodeOutputSchema } from '../schemas';
-import { promoCodePath } from '../urls';
-import { dataResponse } from './shared';
+import type { AppEnv } from '../app-env.js';
+import { TTL } from '../cache.js';
+import { fetchAmazonPage } from '../fetcher.js';
+import { clean, firstText } from '../parsers/helpers.js';
+import { parseProductCards } from '../parsers/search.js';
+import { promoCodeInputSchema, promoCodeOutputSchema } from '../schemas.js';
+import { promoCodePath } from '../urls.js';
+import { dataResponse } from './shared.js';
 
 export const promoCodeRoutes = new Hono<AppEnv>();
 
