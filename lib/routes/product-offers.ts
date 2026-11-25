@@ -50,6 +50,9 @@ productOffersRoutes.get('/', (c) =>
         ? offersVisibleText.slice(Math.max(0, noOffersMatch.index - 220), noOffersMatch.index + 380).slice(0, 600)
         : null;
       console.info('[offers] upstream page diagnostics', {
+        requestedPath: offersPath(params),
+        finalUrl: offersPage.url,
+        finalPath,
         status: offersPage.status,
         htmlLength: offersHtml.length,
         pageTitle,
