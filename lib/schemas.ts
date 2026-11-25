@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { COUNTRY_CODES } from './countries';
+import { COUNTRY_CODES } from './countries.js';
 
 /** Helpers for query-string coercion (all query values arrive as strings). */
 
