@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
-import type { AppEnv } from '../app-env';
-import { TTL } from '../cache';
-import { fetchAmazonPage } from '../fetcher';
-import { parseCategoryList } from '../parsers/categories';
-import { categoryListInputSchema, categoryListOutputSchema } from '../schemas';
-import { categoryListPath } from '../urls';
-import { dataResponse } from './shared';
+import type { AppEnv } from '../app-env.js';
+import { TTL } from '../cache.js';
+import { fetchAmazonPage } from '../fetcher.js';
+import { parseCategoryList } from '../parsers/categories.js';
+import { categoryListInputSchema, categoryListOutputSchema } from '../schemas.js';
+import { categoryListPath } from '../urls.js';
+import { dataResponse } from './shared.js';
 
 export const categoryListRoutes = new Hono<AppEnv>();
 
