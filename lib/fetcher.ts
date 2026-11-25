@@ -109,6 +109,12 @@ export async function fetchAmazonPage(
   const targetUrl = `${amazonBaseUrl(country)}${path}`;
   const proxies = listFromEnv('PROXY_URLS');
   const scraperTemplate = process.env.SCRAPER_API_URL;
+  const proxyCountry = country.code === 'UK' ? 'gb' : country.code.toLowerCase();
+  const scraperTemplateWithCountry = scraperTemplate
+    ? /[?&]proxy_country=/i.test(scraperTemplate)
+      ? scraperTemplate
+      : `${scraperTemplate}${scraperTemplate.includes('?') ? '&' : '?'}proxy_country=${encodeURIComponent(proxyCountry)}`
+    : undefined;
   const unblockerTemplate = process.env.UNBLOCKER_URL_TEMPLATE;
   const attempts = 1 + retries();
   let lastError: Error = upstreamUnavailable();
@@ -117,7 +123,7 @@ export async function fetchAmazonPage(
     try {
       const result = await fetchOnce(targetUrl, country, {
         proxyUrl: proxies.length ? proxies[attempt % proxies.length] : undefined,
-        template: scraperTemplate,
+        template: scraperTemplateWithCountry,
       });
       if (isCaptchaPage(result.html) || result.status === 403 || result.status === 429) {
         lastError = upstreamBlocked(`Amazon returned a robot check or a ${result.status} response`);
