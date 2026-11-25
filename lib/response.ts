@@ -1,4 +1,4 @@
-import type { AppContext } from './app-env';
+import type { AppContext } from './app-env.js';
 
 /** Standard response envelope described in PRD section 7. */
 export function ok(
