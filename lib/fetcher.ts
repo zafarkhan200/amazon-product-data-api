@@ -49,6 +49,14 @@ function withTemplate(template: string | undefined, targetUrl: string): string |
   return template.replace('{url}', encodeURIComponent(targetUrl));
 }
 
+function safeBodyPreview(body: string): string {
+  return body
+    .slice(0, 350)
+    .replace(/([?&](?:apikey|api_key|token|key)=)[^&\\s"'<>]*/gi, '$1[REDACTED]')
+    .replace(/(["']?(?:api[_-]?key|token|authorization)["']?\\s*[:=]\\s*["']?)[^"',\\s}]+/gi, '$1[REDACTED]')
+    .replace(/https?:\\/\\/[^\\s"'<>]+/gi, '[URL]');
+}
+
 async function fetchOnce(
   targetUrl: string,
   country: CountryConfig,
@@ -75,6 +83,17 @@ async function fetchOnce(
       ...(dispatcher ? { dispatcher } : {}),
     } as RequestInit);
     const html = await response.text();
+
+    // Log only limited, redacted response diagnostics from the scraper provider.
+    // Never log the request URL, API key, headers, or full response body.
+    if (options.template && (!html.toLowerCase().includes('<html') || response.status >= 400)) {
+      console.warn('[scraper] unexpected provider response', {
+        status: response.status,
+        contentType: response.headers.get('content-type') ?? '',
+        bodyPreview: safeBodyPreview(html),
+      });
+    }
+
     return { html, url: targetUrl, status: response.status };
   } finally {
     void dispatcher?.close();
