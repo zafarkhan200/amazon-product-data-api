@@ -1,7 +1,7 @@
 import { load } from 'cheerio';
-import type { CountryConfig } from '../countries';
-import type { Category, CategoryListData } from '../types';
-import { clean, dedupeBy } from './helpers';
+import type { CountryConfig } from '../countries.js';
+import type { Category, CategoryListData } from '../types.js';
+import { clean, dedupeBy } from './helpers.js';
 
 /** Fallback node ids keep the endpoint useful when Amazon changes nav markup. */
 const FALLBACK_CATEGORIES: Category[] = [
