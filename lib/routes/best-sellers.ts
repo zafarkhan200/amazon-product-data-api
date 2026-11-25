@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
-import type { AppEnv } from '../app-env';
-import { TTL } from '../cache';
-import { fetchAmazonPage } from '../fetcher';
-import { parseBestSellers } from '../parsers/best-sellers';
-import { bestSellersInputSchema, bestSellersOutputSchema } from '../schemas';
-import { bestSellersPath } from '../urls';
-import { dataResponse } from './shared';
+import type { AppEnv } from '../app-env.js';
+import { TTL } from '../cache.js';
+import { fetchAmazonPage } from '../fetcher.js';
+import { parseBestSellers } from '../parsers/best-sellers.js';
+import { bestSellersInputSchema, bestSellersOutputSchema } from '../schemas.js';
+import { bestSellersPath } from '../urls.js';
+import { dataResponse } from './shared.js';
 
 export const bestSellersRoutes = new Hono<AppEnv>();
 
