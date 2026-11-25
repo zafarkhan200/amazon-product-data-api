@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
-import type { AppEnv } from '../app-env';
-import { TTL } from '../cache';
-import { fetchAmazonPage } from '../fetcher';
-import { parseAsinToGtin } from '../parsers/identifiers';
-import { asinToGtinInputSchema, asinToGtinOutputSchema } from '../schemas';
-import { productPath } from '../urls';
-import { dataResponse } from './shared';
+import type { AppEnv } from '../app-env.js';
+import { TTL } from '../cache.js';
+import { fetchAmazonPage } from '../fetcher.js';
+import { parseAsinToGtin } from '../parsers/identifiers.js';
+import { asinToGtinInputSchema, asinToGtinOutputSchema } from '../schemas.js';
+import { productPath } from '../urls.js';
+import { dataResponse } from './shared.js';
 
 export const asinToGtinRoutes = new Hono<AppEnv>();
 
