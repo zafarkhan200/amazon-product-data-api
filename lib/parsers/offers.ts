@@ -31,19 +31,19 @@ export function parseOffers(
     // Only accept an actual currency-marked price. Amazon delivery text can contain
     // dates such as "Friday, November 27"; parsePriceText alone would read "27" as a price.
     const currencyMarkers: Record<string, RegExp> = {
-      USD: /\\$/,
-      CAD: /\\$/,
-      AUD: /\\$/,
-      MXN: /\\$/,
+      USD: /\$/,
+      CAD: /\$/,
+      AUD: /\$/,
+      MXN: /\$/,
       GBP: /£/,
       EUR: /€/,
       INR: /₹/,
-      AED: /د\\.?إ|AED/i,
-      SAR: /ر\\.?س|SAR/i,
-      EGP: /ج\\.?م|EGP/i,
+      AED: /د\.?إ|AED/i,
+      SAR: /ر\.?س|SAR/i,
+      EGP: /ج\.?م|EGP/i,
       JPY: /¥|￥/,
       CNY: /¥|￥|元/,
-      BRL: /R\\$/,
+      BRL: /R\$/,
       TRY: /₺/,
       SEK: /kr/i,
       PLN: /zł/i,
@@ -55,7 +55,7 @@ export function parseOffers(
       '.a-price .a-offscreen',
       '.olpOfferPrice',
     ];
-    let price;
+    let price: ReturnType<typeof priceFrom>;
     for (const selector of priceSelectors) {
       const candidate = row.find(selector).first();
       const raw = clean(candidate.text()) || candidate.attr('content') || candidate.attr('data-a-color');
@@ -79,8 +79,8 @@ export function parseOffers(
         ['[aria-label*="feedback"]', '[aria-label*="Feedback"]', '[data-hook="seller-rating"]'],
         'aria-label',
       ) ?? firstText(row, ['[data-hook="seller-rating"]']);
-    const feedbackPercentMatch = sellerFeedback?.match(/(\\d{1,3}(?:[.,]\\d+)?)\\s*%/);
-    const feedbackCountMatch = sellerFeedback?.match(/([\\d,.]+)\\s*(?:ratings?|feedback(?:\s+ratings?)?)/i);
+    const feedbackPercentMatch = sellerFeedback?.match(/(\d{1,3}(?:[.,]\d+)?)\s*%/);
+    const feedbackCountMatch = sellerFeedback?.match(/([\d,.]+)\s*(?:ratings?|feedback(?:\s+ratings?)?)/i);
     const sellerFeedbackPercent = feedbackPercentMatch
       ? Number.parseFloat(feedbackPercentMatch[1]!.replace(',', '.'))
       : undefined;
