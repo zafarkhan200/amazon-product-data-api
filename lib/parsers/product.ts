@@ -37,7 +37,7 @@ const ORIGINAL_PRICE_SELECTORS = [
 ];
 
 /** Fields available both on a product page and in the header of an offers page. */
-export function parseProductBase($: CheerioAPI, country: CountryConfig): Product {
+export function parseProductBase($: CheerioAPI, country: CountryConfig, asinOverride?: string): Product {
   const ld = jsonLdProduct($) ?? {};
   const canonical =
     firstAttr($, ['link[rel="canonical"]'], 'href') ??
@@ -45,7 +45,8 @@ export function parseProductBase($: CheerioAPI, country: CountryConfig): Product
   const asin =
     firstAttr($, ['input#ASIN', 'input[name="ASIN"]'], 'value') ??
     asinFromHref(canonical) ??
-    (/^[A-Z0-9]{10}$/.test(String(ld.sku ?? '')) ? String(ld.sku) : undefined);
+    (/^[A-Z0-9]{10}$/.test(String(ld.sku ?? '')) ? String(ld.sku) : undefined) ??
+    (asinOverride && /^[A-Z0-9]{10}$/.test(asinOverride) ? asinOverride.toUpperCase() : undefined);
 
   if (!asin) throw notFound('ASIN not found on the upstream page');
 
@@ -126,9 +127,9 @@ export function parseProductBase($: CheerioAPI, country: CountryConfig): Product
   };
 }
 
-export function parseProductDetails(html: string, country: CountryConfig): ProductDetails {
+export function parseProductDetails(html: string, country: CountryConfig, asinOverride?: string): ProductDetails {
   const $ = load(html);
-  const base = parseProductBase($, country);
+  const base = parseProductBase($, country, asinOverride);
   const ld = jsonLdProduct($) ?? {};
 
   const bullets = allTexts($, '#feature-bullets li span.a-list-item').filter(
