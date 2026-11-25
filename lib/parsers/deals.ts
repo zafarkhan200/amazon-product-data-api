@@ -1,6 +1,6 @@
 import { load } from 'cheerio';
-import type { CountryConfig } from '../countries';
-import type { Deal, DealsData, DealProductsData } from '../types';
+import type { CountryConfig } from '../countries.js';
+import type { Deal, DealsData, DealProductsData } from '../types.js';
 import {
   absoluteUrl,
   clean,
@@ -8,8 +8,8 @@ import {
   firstAttr,
   firstText,
   parseNumber,
-} from './helpers';
-import { parseProductCards, parseSearchResults } from './search';
+} from './helpers.js';
+import { parseProductCards, parseSearchResults } from './search.js';
 
 function dealIdFromHref(href: string | undefined): string | undefined {
   if (!href) return undefined;
