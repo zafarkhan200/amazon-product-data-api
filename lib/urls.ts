@@ -52,15 +52,11 @@ export function productPath(asin: string): string {
 }
 
 export function offersPath(params: OffersInput): string {
-  if (params.condition) {
-    const query = new URLSearchParams({
-      condition: params.condition,
-      startIndex: String((params.page - 1) * params.limit),
-    });
-    return `/gp/offer-listing/${params.asin}/?${query.toString()}`;
-  }
-  const query = new URLSearchParams({ th: '1', psc: '1' });
-  return `/dp/${params.asin}/?${query.toString()}`;
+  const query = new URLSearchParams({
+    startIndex: String((params.page - 1) * params.limit),
+  });
+  if (params.condition) query.set('condition', params.condition);
+  return `/gp/offer-listing/${params.asin}/?${query.toString()}`;
 }
 
 export function reviewsPath(params: ReviewsInput): string {
