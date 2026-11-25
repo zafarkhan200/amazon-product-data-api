@@ -1,6 +1,6 @@
 import { load } from 'cheerio';
-import type { CountryConfig } from '../countries';
-import type { BestSellersData, RankedProduct } from '../types';
+import type { CountryConfig } from '../countries.js';
+import type { BestSellersData, RankedProduct } from '../types.js';
 import {
   absoluteUrl,
   asinFromHref,
@@ -12,7 +12,7 @@ import {
   parseNumber,
   parsePriceText,
   parseRating,
-} from './helpers';
+} from './helpers.js';
 
 export function parseBestSellers(
   html: string,
