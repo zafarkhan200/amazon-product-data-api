@@ -76,7 +76,7 @@ export function parseOffers(
     const sellerFeedback =
       firstAttr(
         row,
-        ['[aria-label*="feedback"]', '[aria-label*="Feedback"]', '[data-hook="seller-rating"]'],
+        ['[aria-label*="feedback"]', '[aria-label*="Feedback"]', '[aria-label*="seller"]', '[data-hook="seller-rating"]'],
         'aria-label',
       ) ?? firstText(row, ['[data-hook="seller-rating"]']);
     const feedbackPercentMatch = sellerFeedback?.match(/(\d{1,3}(?:[.,]\d+)?)\s*%/);
@@ -96,7 +96,7 @@ export function parseOffers(
       shipping,
       delivery_date: deliveryDate,
       condition: firstText(row, ['#aod-offer-heading', '.aod-condition', '.olpCondition', '.a-color-secondary']),
-      is_fba: /fulfilled by amazon/i.test(rowText),
+      is_fba: /fulfilled by amazon|ships from amazon(?:\\.com)?/i.test(rowText),
       is_prime: /\bprime\b/i.test(rowText),
       url:
         firstAttr(row, ['a[href*="/dp/"]'], 'href') ??
