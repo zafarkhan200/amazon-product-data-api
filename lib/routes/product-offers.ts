@@ -22,7 +22,25 @@ productOffersRoutes.get('/', (c) =>
       const productPage = await fetchAmazonPage(productPath(params.asin), country);
       const product = parseProductDetails(productPage.html, country, params.asin);
       const offersPage = await fetchAmazonPage(offersPath(params), country);
-      return parseOffers(offersPage.html, country, params.page, params.limit, product);
+      const offersHtml = offersPage.html;
+      const pageTitle = offersHtml.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i)?.[1]
+        ?.replace(/<[^>]+>/g, ' ')
+        .replace(/\\s+/g, ' ')
+        .trim()
+        .slice(0, 160);
+      console.info('[offers] upstream page diagnostics', {
+        status: offersPage.status,
+        htmlLength: offersHtml.length,
+        pageTitle,
+        hasAodContainer: /id=["']aod-container["']/i.test(offersHtml),
+        hasAodOfferId: /data-aod-offer-id/i.test(offersHtml),
+        hasAodOfferClass: /class=["'][^"']*aod-offer/i.test(offersHtml),
+        hasOlpOffer: /class=["'][^"']*olpOffer/i.test(offersHtml),
+        hasOfferListing: /offer-listing|offerlist/i.test(offersHtml),
+        hasCaptcha: /captcha|robot check|validateCaptcha/i.test(offersHtml.slice(0, 60000)),
+        hasNoOffersMessage: /no featured offers|no offers available|currently unavailable/i.test(offersHtml),
+      });
+      return parseOffers(offersHtml, country, params.page, params.limit, product);
     },
   }),
 );
