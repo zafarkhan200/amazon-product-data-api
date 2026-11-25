@@ -9,14 +9,19 @@ export function parseOffers(
   country: CountryConfig,
   page: number,
   limit: number,
+  productOverride?: ProductDetails,
 ): OffersData {
   const $ = load(html);
 
-  let product;
-  try {
-    product = parseProductDetails(html, country);
-  } catch {
-    product = parseProductBase($, country);
+  let product: ProductDetails | Product;
+  if (productOverride) {
+    product = productOverride;
+  } else {
+    try {
+      product = parseProductDetails(html, country);
+    } catch {
+      product = parseProductBase($, country);
+    }
   }
 
   const offers: Offer[] = [];
