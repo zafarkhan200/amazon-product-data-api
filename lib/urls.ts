@@ -52,11 +52,10 @@ export function productPath(asin: string): string {
 }
 
 export function offersPath(params: OffersInput): string {
-  const query = new URLSearchParams({
-    startIndex: String((params.page - 1) * params.limit),
-  });
-  if (params.condition) query.set('condition', params.condition);
-  return `/gp/offer-listing/${params.asin}/?${query.toString()}`;
+  // Amazon now loads seller offers through the All Offers Display (AOD) AJAX endpoint.
+  const query = new URLSearchParams({ asin: params.asin });
+  if (params.page > 1) query.set('pageno', String(params.page));
+  return `/gp/product/ajax/aodAjaxMain/?${query.toString()}`;
 }
 
 export function reviewsPath(params: ReviewsInput): string {
