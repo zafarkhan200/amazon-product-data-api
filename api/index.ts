@@ -1,6 +1,5 @@
-/** Vercel serverless entry point. All routes are rewritten here by vercel.json. */
+/** Vercel Node.js entry point. Adapt Node request/response to Hono's Fetch API. */
+import { getRequestListener } from '@hono/node-server';
 import app from '../lib/app.js';
 
-export default async function handler(request: Request): Promise<Response> {
-  return app.fetch(request);
-}
+export default getRequestListener(app.fetch);
