@@ -29,7 +29,8 @@ productOffersRoutes.get('/', (c) =>
         } catch {
           return null;
         }
-      })();\n      const pageTitle = offersHtml.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]
+      })();
+      const pageTitle = offersHtml.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]
         ?.replace(/<[^>]+>/g, ' ')
         .replace(/\s+/g, ' ')
         .trim()
