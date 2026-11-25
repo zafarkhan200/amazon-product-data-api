@@ -100,12 +100,14 @@ export function parseProductBase($: CheerioAPI, country: CountryConfig): Product
     .filter((image): image is string => Boolean(image));
 
   const photo = imageCandidates[0];
-  const href = firstAttr($, ['#buybox a[href*="/dp/"]'], 'href') ?? canonical;
+  // Build the product URL from the ASIN we actually parsed. Amazon buy-box links can
+  // point to a different child ASIN or a recommendation, so they are not reliable here.
+  const productUrl = absoluteUrl(`/dp/${asin}`, country.domain);
 
   return {
     asin,
     title,
-    url: absoluteUrl(href, country.domain),
+    url: productUrl,
     photo,
     price,
     rating:
@@ -189,6 +191,11 @@ export function parseProductDetails(html: string, country: CountryConfig): Produ
 
   const seller =
     firstText($, ['#merchantInfo .a-color-base', '#sellerProfileTriggerId']) ?? undefined;
+  // Amazon sometimes embeds scripts inside availability containers. Exclude those
+  // scripts so the API returns customer-facing availability text only.
+  const availabilityNode = $('#availability').first().clone();
+  availabilityNode.find('script, style, noscript').remove();
+  const availability = clean(availabilityNode.text()) || undefined;
   const buyBoxPrice =
     priceFrom($, ['#buybox .a-price .a-offscreen', '#apex_offerDisplay_desktop .a-offscreen'], country.currency) ??
     base.price;
@@ -213,11 +220,11 @@ export function parseProductDetails(html: string, country: CountryConfig): Produ
       price: buyBoxPrice,
       seller,
       fulfillment: firstText($, ['#fulfillerInfoFeature_feature_div', '#fulfillerInfoFeature_feature_div span']),
-      availability: firstText($, ['#availability']),
+      availability,
       shipping: firstText($, ['#shippingFeeMessage_feature_div', '#buybox-shipping-message']),
       is_prime: base.prime,
     },
-    availability: firstText($, ['#availability']),
+    availability,
     coupon: firstText($, ['#promoPriceBlockMessage .a-color-success', '.couponLabel']),
   };
 }
