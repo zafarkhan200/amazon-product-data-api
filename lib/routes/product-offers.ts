@@ -23,13 +23,6 @@ productOffersRoutes.get('/', (c) =>
       const product = parseProductDetails(productPage.html, country, params.asin);
       const offersPage = await fetchAmazonPage(offersPath(params), country);
       const offersHtml = offersPage.html;
-      const finalPath = (() => {
-        try {
-          return new URL(offersPage.url).pathname;
-        } catch {
-          return null;
-        }
-      })();
       const pageTitle = offersHtml.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]
         ?.replace(/<[^>]+>/g, ' ')
         .replace(/\s+/g, ' ')
@@ -51,8 +44,6 @@ productOffersRoutes.get('/', (c) =>
         : null;
       console.info('[offers] upstream page diagnostics', {
         requestedPath: offersPath(params),
-        finalUrl: offersPage.url,
-        finalPath,
         status: offersPage.status,
         htmlLength: offersHtml.length,
         pageTitle,
