@@ -1,11 +1,11 @@
-import type { CountryConfig } from './countries';
+import type { CountryConfig } from './countries.js';
 import type {
   BestSellersInput,
   DealsInput,
   OffersInput,
   ReviewsInput,
   SearchInput,
-} from './schemas';
+} from './schemas.js';
 
 const slugify = (value: string) =>
   value
