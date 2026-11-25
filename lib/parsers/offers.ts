@@ -28,12 +28,41 @@ export function parseOffers(
   $('#aod-offer, div[data-aod-offer-id], .aod-offer, #aod-new-table tr.aod-offer, div.olpOffer').each((_, element) => {
     const row = $(element);
     const rowText = clean(row.text());
-    const price =
-      priceFrom(
-        row,
-        ['.a-price .aok-offscreen', '.a-price .a-offscreen', '.olpOfferPrice', 'span.a-color-base', '.a-price-whole'],
-        country.currency,
-      ) ?? undefined;
+    // Only accept an actual currency-marked price. Amazon delivery text can contain
+    // dates such as "Friday, November 27"; parsePriceText alone would read "27" as a price.
+    const currencyMarkers: Record<string, RegExp> = {
+      USD: /\\$/,
+      CAD: /\\$/,
+      AUD: /\\$/,
+      MXN: /\\$/,
+      GBP: /£/,
+      EUR: /€/,
+      INR: /₹/,
+      AED: /د\\.?إ|AED/i,
+      SAR: /ر\\.?س|SAR/i,
+      EGP: /ج\\.?م|EGP/i,
+      JPY: /¥|￥/,
+      CNY: /¥|￥|元/,
+      BRL: /R\\$/,
+      TRY: /₺/,
+      SEK: /kr/i,
+      PLN: /zł/i,
+    };
+    const priceSelectors = [
+      '#aod-offer-price .a-offscreen',
+      '.aod-offer-price .a-offscreen',
+      'span.a-price > span.a-offscreen',
+      '.a-price .a-offscreen',
+      '.olpOfferPrice',
+    ];
+    let price;
+    for (const selector of priceSelectors) {
+      const candidate = row.find(selector).first();
+      const raw = clean(candidate.text()) || candidate.attr('content') || candidate.attr('data-a-color');
+      if (!raw || !(currencyMarkers[country.currency] ?? /(?!) /).test(raw)) continue;
+      price = priceFrom(row, [selector], country.currency);
+      if (price) break;
+    }
     const seller = firstText(row, [
       '#aod-offer-soldBy a',
       '#aod-offer-soldBy',
@@ -47,14 +76,22 @@ export function parseOffers(
     const sellerFeedback =
       firstAttr(
         row,
-        ['[aria-label*="feedback"]', '[aria-label*="Feedback"]', '[aria-label*="seller"]'],
+        ['[aria-label*="feedback"]', '[aria-label*="Feedback"]', '[data-hook="seller-rating"]'],
         'aria-label',
       ) ?? firstText(row, ['[data-hook="seller-rating"]']);
-    const sellerRating = parseCount(sellerFeedback);
+    const feedbackPercentMatch = sellerFeedback?.match(/(\\d{1,3}(?:[.,]\\d+)?)\\s*%/);
+    const feedbackCountMatch = sellerFeedback?.match(/([\\d,.]+)\\s*(?:ratings?|feedback(?:\s+ratings?)?)/i);
+    const sellerFeedbackPercent = feedbackPercentMatch
+      ? Number.parseFloat(feedbackPercentMatch[1]!.replace(',', '.'))
+      : undefined;
+    const sellerFeedbackCount = feedbackCountMatch
+      ? parseCount(feedbackCountMatch[1])
+      : undefined;
 
     offers.push({
       seller,
-      seller_rating: sellerRating,
+      seller_feedback_percent: sellerFeedbackPercent,
+      seller_feedback_count: sellerFeedbackCount,
       price,
       shipping,
       delivery_date: deliveryDate,
