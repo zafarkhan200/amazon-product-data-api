@@ -168,7 +168,8 @@ export async function fetchAmazonReviewsData(
   }
 
   const separator = scraperTemplate.includes('?') ? '&' : '?';
-  const reviewTemplate = `${scraperTemplate}${separator}extract=auto&proxy_country=${encodeURIComponent(country.code.toLowerCase())}`;
+  const proxyCountry = country.code === 'UK' ? 'gb' : country.code.toLowerCase();
+  const reviewTemplate = `${scraperTemplate}${separator}extract=auto&proxy_country=${encodeURIComponent(proxyCountry)}`;
   const targetUrl = `${amazonBaseUrl(country)}/dp/${encodeURIComponent(asin)}`;
   const result = await fetchOnce(targetUrl, country, { template: reviewTemplate });
 
