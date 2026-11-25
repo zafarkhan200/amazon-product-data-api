@@ -47,6 +47,7 @@ productOffersRoutes.get('/', (c) =>
         status: offersPage.status,
         htmlLength: offersHtml.length,
         pageTitle,
+        hasAodOfferList: /id=["']aod-offer-list["']/i.test(offersHtml),
         hasAodContainer: /id=["']aod-container["']/i.test(offersHtml),
         hasAodOfferId: /data-aod-offer-id/i.test(offersHtml),
         hasAodOfferClass: /class=["'][^"']*aod-offer/i.test(offersHtml),
