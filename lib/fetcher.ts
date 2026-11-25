@@ -153,3 +153,45 @@ export async function fetchAmazonPage(
 
   throw lastError;
 }
+
+/**
+ * Fetch structured Amazon review data through ZenRows' Amazon reviews extractor.
+ * It uses the product detail URL (/dp/ASIN), not Amazon's /product-reviews/ URL.
+ */
+export async function fetchAmazonReviewsData(
+  asin: string,
+  country: CountryConfig,
+): Promise<Record<string, unknown>> {
+  const scraperTemplate = process.env.SCRAPER_API_URL;
+  if (!scraperTemplate) {
+    throw upstreamUnavailable('Structured Amazon reviews require SCRAPER_API_URL to be configured');
+  }
+
+  const separator = scraperTemplate.includes('?') ? '&' : '?';
+  const reviewTemplate = `${scraperTemplate}${separator}extract=auto&proxy_country=${encodeURIComponent(country.code.toLowerCase())}`;
+  const targetUrl = `${amazonBaseUrl(country)}/dp/${encodeURIComponent(asin)}`;
+  const result = await fetchOnce(targetUrl, country, { template: reviewTemplate });
+
+  if (result.status >= 400) {
+    throw upstreamUnavailable(`ZenRows returned HTTP ${result.status} for Amazon reviews`);
+  }
+
+  let response: unknown;
+  try {
+    response = JSON.parse(result.html);
+  } catch {
+    throw upstreamUnavailable('ZenRows returned an unexpected response for Amazon reviews');
+  }
+
+  if (!response || typeof response !== 'object') {
+    throw upstreamUnavailable('ZenRows returned an invalid reviews response');
+  }
+
+  const parsed = (response as { parsed?: unknown }).parsed;
+  if (!parsed || typeof parsed !== 'object') {
+    throw upstreamUnavailable('ZenRows did not return structured Amazon review data');
+  }
+
+  return parsed as Record<string, unknown>;
+}
+
