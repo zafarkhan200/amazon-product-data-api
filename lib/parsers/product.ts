@@ -1,7 +1,7 @@
 import { load, type CheerioAPI } from 'cheerio';
-import type { CountryConfig } from '../countries';
-import { notFound } from '../errors';
-import type { Product, ProductDetails } from '../types';
+import type { CountryConfig } from '../countries.js';
+import { notFound } from '../errors.js';
+import type { Product, ProductDetails } from '../types.js';
 import {
   absoluteUrl,
   allTexts,
@@ -17,7 +17,7 @@ import {
   priceFrom,
   rankFromText,
   requireTitle,
-} from './helpers';
+} from './helpers.js';
 
 const PRICE_SELECTORS = [
   '#corePriceDisplay_desktop_feature_div .a-offscreen',
