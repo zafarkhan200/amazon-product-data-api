@@ -1,8 +1,8 @@
 import type { CheerioAPI } from 'cheerio';
 import { load } from 'cheerio';
-import type { CountryConfig } from '../countries';
-import { upstreamUnavailable } from '../errors';
-import type { Product } from '../types';
+import type { CountryConfig } from '../countries.js';
+import { upstreamUnavailable } from '../errors.js';
+import type { Product } from '../types.js';
 import {
   absoluteUrl,
   allTexts,
@@ -14,7 +14,7 @@ import {
   parseCount,
   parsePriceText,
   parseRating,
-} from './helpers';
+} from './helpers.js';
 
 /** Parse product tiles from search-like pages (search, deals, GTIN lookup, coupons). */
 export function parseProductCards($: CheerioAPI, country: CountryConfig): Product[] {
