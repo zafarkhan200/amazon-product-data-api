@@ -1,10 +1,10 @@
 import { load } from 'cheerio';
-import type { CountryConfig } from '../countries';
-import { notFound, upstreamUnavailable } from '../errors';
-import type { AsinToGtinData, GtinToAsinData } from '../types';
-import { clean, jsonLd } from './helpers';
-import { parseProductDetails } from './product';
-import { parseProductCards } from './search';
+import type { CountryConfig } from '../countries.js';
+import { notFound, upstreamUnavailable } from '../errors.js';
+import type { AsinToGtinData, GtinToAsinData } from '../types.js';
+import { clean, jsonLd } from './helpers.js';
+import { parseProductDetails } from './product.js';
+import { parseProductCards } from './search.js';
 
 const IDENTIFIER_PATTERNS: Record<string, RegExp[]> = {
   'EAN-13': [
