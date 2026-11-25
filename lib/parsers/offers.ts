@@ -1,8 +1,8 @@
 import { load } from 'cheerio';
-import type { CountryConfig } from '../countries';
-import type { Offer, OffersData } from '../types';
-import { clean, dedupeBy, firstAttr, firstText, parseCount, priceFrom } from './helpers';
-import { parseProductBase, parseProductDetails } from './product';
+import type { CountryConfig } from '../countries.js';
+import type { Offer, OffersData } from '../types.js';
+import { clean, dedupeBy, firstAttr, firstText, parseCount, priceFrom } from './helpers.js';
+import { parseProductBase, parseProductDetails } from './product.js';
 
 export function parseOffers(
   html: string,
