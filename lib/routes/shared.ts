@@ -1,11 +1,11 @@
 import type { ZodTypeAny, z } from 'zod';
-import type { AppContext } from '../app-env';
-import { cached } from '../cache';
-import { getCountry } from '../countries';
-import type { CountryConfig } from '../countries';
-import { ApiError, badRequest } from '../errors';
-import { ok } from '../response';
-import { describeZodError } from '../schemas';
+import type { AppContext } from '../app-env.js';
+import { cached } from '../cache.js';
+import { getCountry } from '../countries.js';
+import type { CountryConfig } from '../countries.js';
+import { ApiError, badRequest } from '../errors.js';
+import { ok } from '../response.js';
+import { describeZodError } from '../schemas.js';
 
 /**
  * Shared request pipeline: validate query -> cache lookup -> upstream fetch and
