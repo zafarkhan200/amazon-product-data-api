@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
-import type { AppEnv } from '../app-env';
-import { TTL } from '../cache';
-import { fetchAmazonPage } from '../fetcher';
-import { parseDeals } from '../parsers/deals';
-import { dealsInputSchema, dealsOutputSchema } from '../schemas';
-import { dealsPath } from '../urls';
-import { dataResponse } from './shared';
+import type { AppEnv } from '../app-env.js';
+import { TTL } from '../cache.js';
+import { fetchAmazonPage } from '../fetcher.js';
+import { parseDeals } from '../parsers/deals.js';
+import { dealsInputSchema, dealsOutputSchema } from '../schemas.js';
+import { dealsPath } from '../urls.js';
+import { dataResponse } from './shared.js';
 
 export const dealsRoutes = new Hono<AppEnv>();
 
