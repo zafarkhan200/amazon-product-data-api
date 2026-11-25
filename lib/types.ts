@@ -60,6 +60,11 @@ export interface SearchData {
 
 export interface Offer {
   seller?: string;
+  /** Seller's positive-feedback percentage, only when Amazon explicitly provides a percent. */
+  seller_feedback_percent?: number;
+  /** Seller feedback total, only when Amazon explicitly labels it as a count. */
+  seller_feedback_count?: number;
+  /** @deprecated Use seller_feedback_percent or seller_feedback_count. */
   seller_rating?: number;
   price?: Price;
   shipping?: string;
