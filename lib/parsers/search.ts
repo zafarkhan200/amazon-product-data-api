@@ -121,6 +121,19 @@ export function parseSearchResults(
   const totalProducts = totalMatch ? parseCount(totalMatch[1]) ?? products.length : products.length;
 
   if (!products.length && !/no results|did not match any|no products found/i.test(infoText)) {
+    // Safe diagnostics for production logs: counts only, never log page HTML or credentials.
+    const cardCount = $('[data-component-type="s-search-result"], div.s-result-item[data-asin], div[data-asin]').length;
+    const asinAttributeCount = $('[data-asin]').filter((_, element) =>
+      /^[A-Z0-9]{10}$/i.test($(element).attr('data-asin') ?? ''),
+    ).length;
+    const productLinkCount = $('a[href*="/dp/"], a[href*="/gp/product/"]').length;
+    console.warn('[search] zero products parsed', {
+      htmlLength: html.length,
+      pageTitle: clean($('title').first().text()).slice(0, 120),
+      cardCount,
+      validAsinAttributeCount: asinAttributeCount,
+      productLinkCount,
+    });
     throw upstreamUnavailable('Search page did not contain any recognizable product results');
   }
 
