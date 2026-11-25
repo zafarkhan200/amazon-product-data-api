@@ -1,7 +1,7 @@
 import { load, type Cheerio, type CheerioAPI } from 'cheerio';
 import type { AnyNode } from 'domhandler';
-import { notFound } from '../errors';
-import type { Price } from '../types';
+import { notFound } from '../errors.js';
+import type { Price } from '../types.js';
 
 /** A full document ($), a scoped selection, or a raw DOM node. */
 export type Selectable = CheerioAPI | Cheerio<AnyNode> | AnyNode;
