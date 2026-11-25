@@ -1,14 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { COUNTRIES } from '../lib/countries';
-import { parseBestSellers } from '../lib/parsers/best-sellers';
-import { parseCategoryList } from '../lib/parsers/categories';
-import { parseDeals } from '../lib/parsers/deals';
-import { parseAsinToGtin } from '../lib/parsers/identifiers';
-import { parseOffers } from '../lib/parsers/offers';
-import { parseProductDetails } from '../lib/parsers/product';
-import { parseReviews } from '../lib/parsers/reviews';
-import { parseSearchResults } from '../lib/parsers/search';
+import { COUNTRIES } from '../lib/countries.js';
+import { parseBestSellers } from '../lib/parsers/best-sellers.js';
+import { parseCategoryList } from '../lib/parsers/categories.js';
+import { parseDeals } from '../lib/parsers/deals.js';
+import { parseAsinToGtin } from '../lib/parsers/identifiers.js';
+import { parseOffers } from '../lib/parsers/offers.js';
+import { parseProductDetails } from '../lib/parsers/product.js';
+import { parseReviews } from '../lib/parsers/reviews.js';
+import { parseSearchResults } from '../lib/parsers/search.js';
 
 const fixture = (name: string) => readFileSync(new URL(`./fixtures/${name}`, import.meta.url), 'utf8');
 const us = COUNTRIES.US;
