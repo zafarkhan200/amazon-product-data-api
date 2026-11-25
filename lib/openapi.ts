@@ -1,4 +1,4 @@
-import { COUNTRY_CODES } from './countries';
+import { COUNTRY_CODES } from './countries.js';
 
 type Obj = Record<string, unknown>;
 
