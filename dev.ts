@@ -8,7 +8,7 @@ try {
   // .env is optional; Vercel injects environment variables in production.
 }
 
-const { default: app } = await import('./lib/app');
+const { default: app } = await import('./lib/app.js');
 
 const port = Number(process.env.PORT ?? 3000);
 serve({ fetch: app.fetch, port }, (info) => {
