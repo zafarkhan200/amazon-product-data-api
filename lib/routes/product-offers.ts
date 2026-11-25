@@ -20,7 +20,7 @@ productOffersRoutes.get('/', (c) =>
       // Fetch product metadata from the canonical product page. Amazon's
       // offer-listing page may omit #productTitle and other product metadata.
       const productPage = await fetchAmazonPage(productPath(params.asin), country);
-      const product = parseProductDetails(productPage.html, country);
+      const product = parseProductDetails(productPage.html, country, params.asin);
       const offersPage = await fetchAmazonPage(offersPath(params), country);
       return parseOffers(offersPage.html, country, params.page, params.limit, product);
     },
