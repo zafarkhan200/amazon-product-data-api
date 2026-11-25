@@ -52,9 +52,9 @@ function withTemplate(template: string | undefined, targetUrl: string): string |
 function safeBodyPreview(body: string): string {
   return body
     .slice(0, 350)
-    .replace(/([?&](?:apikey|api_key|token|key)=)[^&\\s"'<>]*/gi, '$1[REDACTED]')
-    .replace(/(["']?(?:api[_-]?key|token|authorization)["']?\\s*[:=]\\s*["']?)[^"',\\s}]+/gi, '$1[REDACTED]')
-    .replace(/https?:\\/\\/[^\\s"'<>]+/gi, '[URL]');
+    .replace(/([?&](?:apikey|api_key|token|key)=)[^&\s"'<>]*/gi, '$1[REDACTED]')
+    .replace(/(["']?(?:api[_-]?key|token|authorization)["']?\s*[:=]\s*["']?)[^"',\s}]+/gi, '$1[REDACTED]')
+    .replace(/https?:\/\/[^\s"'<>]+/gi, '[URL]');
 }
 
 async function fetchOnce(
