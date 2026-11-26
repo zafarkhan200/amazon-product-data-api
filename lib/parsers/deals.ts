@@ -150,15 +150,25 @@ export function parseDealProducts(
     productLinkCount: $('a[href*="/dp/"]').length,
     titleNodeCount: $('h2, a[aria-label], img[alt]').length,
     priceNodeCount: $('.a-price .a-offscreen').length,
-    samples: asinNodes.slice(0, 4).map((_, element) => {
+    samples: $('[data-csa-c-item-type="deal"][data-csa-c-item-id]').slice(0, 5).map((_, element) => {
       const card = $(element);
       return {
-        asin: card.attr('data-asin'),
-        tag: element.tagName,
-        className: card.attr('class')?.slice(0, 120),
-        title: firstText(card, ['h2', 'a[aria-label]', 'img[alt]']),
-        href: firstAttr(card, ['a[href*="/dp/"]'], 'href'),
-        price: firstText(card, ['.a-price .a-offscreen']),
+        itemId: card.attr('data-csa-c-item-id'),
+        text: clean(card.text()).slice(0, 260),
+        asinNodes: card.find('[data-asin]').map((__, node) => ({
+          asin: $(node).attr('data-asin'),
+          tag: node.tagName,
+        })).get().slice(0, 5),
+        links: card.find('a[href*="/dp/"]').map((__, node) => ({
+          href: $(node).attr('href')?.slice(0, 180),
+          aria: $(node).attr('aria-label')?.slice(0, 160),
+          text: clean($(node).text()).slice(0, 160),
+        })).get().slice(0, 5),
+        images: card.find('img').map((__, node) => ({
+          alt: $(node).attr('alt')?.slice(0, 160),
+          src: $(node).attr('src')?.slice(0, 180),
+        })).get().slice(0, 3),
+        prices: card.find('.a-price .a-offscreen').map((__, node) => clean($(node).text())).get().slice(0, 5),
       };
     }).get(),
   });
