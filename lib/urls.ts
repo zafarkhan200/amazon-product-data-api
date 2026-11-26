@@ -118,8 +118,9 @@ export function dealProductsPath(dealId: string, page: number): string {
   return `/deals/${encodeURIComponent(dealId)}/?${new URLSearchParams({ pg: String(page) })}`;
 }
 
+/** Amazon promotion details use the ID from /promotion/psp/{promotion_id}. */
 export function promoCodePath(promoCode: string): string {
-  return `/coupons/${encodeURIComponent(promoCode)}/`;
+  return `/promotion/psp/${encodeURIComponent(promoCode)}`;
 }
 
 export function categoryListPath(): string {
