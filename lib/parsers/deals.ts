@@ -138,45 +138,79 @@ export function parseDealProducts(
   page: number,
 ): DealProductsData {
   const $ = load(html);
-  const asinNodes = $('[data-asin]').filter((_, element) =>
-    /^[A-Z0-9]{10}$/i.test($(element).attr('data-asin') ?? ''),
-  );
-  console.warn('[deal_products] markup diagnosis', {
-    htmlLength: html.length,
-    pageTitle: clean($('title').first().text()).slice(0, 120),
-    currentDealCardCount: $('[data-csa-c-item-type="deal"][data-csa-c-item-id]').length,
-    searchCardCount: $('[data-component-type="s-search-result"], div.s-result-item[data-asin]').length,
-    validAsinNodeCount: asinNodes.length,
-    productLinkCount: $('a[href*="/dp/"]').length,
-    titleNodeCount: $('h2, a[aria-label], img[alt]').length,
-    priceNodeCount: $('.a-price .a-offscreen').length,
-    samples: $('[data-csa-c-item-type="deal"][data-csa-c-item-id]').slice(0, 5).map((_, element) => {
-      const card = $(element);
-      return {
-        itemId: card.attr('data-csa-c-item-id'),
-        text: clean(card.text()).slice(0, 260),
-        asinNodes: card.find('[data-asin]').map((__, node) => ({
-          asin: $(node).attr('data-asin'),
-          tag: node.tagName,
-        })).get().slice(0, 5),
-        links: card.find('a[href*="/dp/"]').map((__, node) => ({
-          href: $(node).attr('href')?.slice(0, 180),
-          aria: $(node).attr('aria-label')?.slice(0, 160),
-          text: clean($(node).text()).slice(0, 160),
-        })).get().slice(0, 5),
-        images: card.find('img').map((__, node) => ({
-          alt: $(node).attr('alt')?.slice(0, 160),
-          src: $(node).attr('src')?.slice(0, 180),
-        })).get().slice(0, 3),
-        prices: card.find('.a-price .a-offscreen').map((__, node) => clean($(node).text())).get().slice(0, 5),
-      };
-    }).get(),
+  const products: Product[] = [];
+  const dealCards = $('[data-csa-c-item-type="deal"][data-csa-c-item-id]').filter((_, element) => {
+    const itemId = $(element).attr('data-csa-c-item-id') ?? '';
+    return itemId.endsWith(`amzn1.deal.${dealId}`);
   });
-  const result = parseSearchResults(html, country, dealId, page);
+
+  dealCards.each((_, element) => {
+    const card = $(element);
+    const itemId = card.attr('data-csa-c-item-id') ?? '';
+    const asin = itemId.match(/amzn1\\.asin\\.([A-Z0-9]{10})/i)?.[1]?.toUpperCase();
+    if (!asin) return;
+
+    const href = firstAttr(card, ['a[href*="/dp/"]'], 'href');
+    const title =
+      firstAttr(card, ['a[aria-label]'], 'aria-label') ??
+      firstAttr(card, ['img[alt]'], 'alt') ??
+      undefined;
+    const image = firstAttr(card, ['img'], 'src');
+    const currentPriceText = firstText(card, [
+      '.a-price:not(.a-text-price) .a-offscreen',
+      '.a-price .a-offscreen',
+    ]);
+    const originalPriceText = firstText(card, [
+      '.a-price.a-text-price .a-offscreen',
+      '.a-text-price .a-offscreen',
+    ]);
+    const price = parsePriceText(currentPriceText, country.currency);
+    const originalPrice = parsePriceText(originalPriceText, country.currency);
+    if (price && originalPrice && originalPrice.value > price.value) {
+      price.original_value = originalPrice.value;
+      price.original_display = originalPrice.display;
+      price.discount_percent = Math.round(
+        ((originalPrice.value - price.value) / originalPrice.value) * 100,
+      );
+    }
+
+    const ratingValue = parseRating(firstText(card, [
+      '.a-icon-alt',
+      '[aria-label*="out of 5 stars"]',
+    ]));
+    const ratingCount = parseCount(firstText(card, [
+      '.a-size-base.s-underline-text',
+      '[aria-label*="ratings"]',
+    ]));
+
+    products.push({
+      asin,
+      title,
+      url: absoluteUrl(href, country.domain),
+      photo: absoluteUrl(image, country.domain),
+      price,
+      rating: ratingValue !== undefined || ratingCount !== undefined
+        ? { value: ratingValue ?? 0, count: ratingCount ?? 0 }
+        : undefined,
+      badges: [
+        firstText(card, ['[class*="badgeMessage"]', '[data-component="dui-badge"]']) ?? '',
+      ].filter(Boolean),
+    });
+  });
+
+  const uniqueProducts = dedupeBy(products, (product) => product.asin);
+  if (!uniqueProducts.length) {
+    console.warn('[deal_products] no matching deal cards found', {
+      requestedDealId: dealId,
+      currentDealCardCount: $('[data-csa-c-item-type="deal"][data-csa-c-item-id]').length,
+      htmlLength: html.length,
+    });
+  }
+
   return {
     deal_id: dealId,
-    products: result.products,
-    total_products: result.total_products,
+    products: uniqueProducts,
+    total_products: uniqueProducts.length,
     page,
     country: country.code,
   };
