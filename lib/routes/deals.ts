@@ -49,7 +49,7 @@ dealsRoutes.get('/', (c) =>
             return {
               tag: element.tagName,
               attributes: element.attribs,
-              text: node.text().replace(/\\s+/g, ' ').trim().slice(0, 220),
+              text: node.text().replace(/\s+/g, ' ').trim().slice(0, 220),
               html: node.toString().slice(0, 1400),
             };
           });
@@ -60,7 +60,7 @@ dealsRoutes.get('/', (c) =>
             const node = $(element);
             return {
               href: node.attr('href') ?? null,
-              text: node.text().replace(/\\s+/g, ' ').trim().slice(0, 180),
+              text: node.text().replace(/\s+/g, ' ').trim().slice(0, 180),
               parentHtml: node.parent().parent().toString().slice(0, 1600),
             };
           });
