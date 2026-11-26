@@ -67,12 +67,19 @@ export function parseProductCards($: CheerioAPI, country: CountryConfig): Produc
       );
 
       const image = firstAttr(card, ['img.s-image', 'img[src*="images-amazon"]'], 'src');
-      const title =
-        firstText(card, ['h2', 'a[href*="/dp/"] span', '.a-size-medium.a-color-base']) ??
-        clean(firstAttr(card, ['a[href*="/dp/"]'], 'title') ?? firstAttr(card, ['img.s-image'], 'alt')) ??
-        undefined;
+      const titleCandidates = [
+        firstText(card, ['h2 a span', 'h2 span', 'a[href*="/dp/"] span.a-text-normal']),
+        firstAttr(card, ['a[href*="/dp/"]'], 'title'),
+        firstAttr(card, ['img.s-image'], 'alt'),
+        firstText(card, ['h2', '.a-size-medium.a-color-base']),
+      ].map((value) => clean(value)).filter(Boolean);
+      const genericTitles = new Set(['apple', 'amazon renewed', 'amazon', 'samsung', 'sony']);
+      const title = titleCandidates.find((value) => value.length > 12 && !genericTitles.has(value.toLowerCase())) ??
+        titleCandidates.find((value) => !genericTitles.has(value.toLowerCase()));
       const badges = allTexts(card, '.a-badge-text, [data-cy="badge"], .ribbon').filter(Boolean);
-      const cardText = clean(card.text());
+      const cleanCard = card.clone();
+      cleanCard.find('script, style, noscript').remove();
+      const cardText = clean(cleanCard.text());
       const prime =
         /prime/i.test(clean(card.find('[aria-label*="prime" i], .a-icon-prime, .prime-icon').first().attr('aria-label') ?? '')) ||
         /\bprime\b/i.test(cardText);
@@ -92,10 +99,10 @@ export function parseProductCards($: CheerioAPI, country: CountryConfig): Produc
         sales_volume: /\b(bought|sold)\b/i.test(cardText)
           ? firstText(card, ['.a-size-base.a-color-secondary', '.a-size-small.a-color-secondary'])
           : undefined,
-        delivery_text: firstText(card, [
+        delivery_text: firstText(cleanCard, [
+          '[data-cy="delivery-recipe"]',
           '.a-size-small.a-color-success',
           '.a-color-success.a-size-small',
-          '[data-cy="delivery-recipe"]',
         ]),
         badges: badges.length ? badges : undefined,
       });
