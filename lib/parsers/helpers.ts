@@ -27,7 +27,7 @@ export function repairTextEncoding(value: string): string {
     return decoded.includes('\uFFFD') ? run : decoded;
   });
 
-  return repaired.replace(/[\u200B-\u200D\uFEFF]/g, '');
+  return repaired.replace(/[\u200B-\u200F\uFEFF\u061C]/g, '');
 }
 
 
