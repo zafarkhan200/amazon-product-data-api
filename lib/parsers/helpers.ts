@@ -14,21 +14,25 @@ export function select(root: Selectable, selector: string): Cheerio<AnyNode> {
   return wrapNode(root as AnyNode).find(selector);
 }
 
-/** Decode UTF-8 byte sequences that were incorrectly preserved as Latin-1/control characters. */
+/** Repair UTF-8 text that has been mis-decoded as Latin-1/Windows-1252. */
 export function repairTextEncoding(value: string): string {
   if (!/[ÃÂâðï]/.test(value)) return value;
-  const bytes = Array.from(value, (char) => {
-    const code = char.codePointAt(0)!;
-    return code <= 0xff ? code : null;
+
+  // Work on Latin-1-sized runs independently. Amazon titles can also contain
+  // zero-width spaces, emoji, and other Unicode characters that must be preserved.
+  const repaired = value.replace(/[\u0000-\u00ff]+/g, (run) => {
+    const decoded = Buffer.from(
+      Array.from(run, (char) => char.charCodeAt(0)),
+    ).toString('utf8');
+    return decoded.includes('\uFFFD') ? run : decoded;
   });
-  if (bytes.some((byte) => byte === null)) return value;
-  const repaired = Buffer.from(bytes as number[]).toString('utf8');
-  if (repaired.includes('\uFFFD')) return value;
-  return repaired.replace(/\u200b/g, '');
+
+  return repaired.replace(/[\u200B-\u200D\uFEFF]/g, '');
 }
 
+
 export const clean = (value?: string | null): string =>
-  (value ?? '')
+  repairTextEncoding(value ?? '')
     .replace(/\u00a0/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
