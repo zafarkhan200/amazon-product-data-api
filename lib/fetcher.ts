@@ -127,6 +127,18 @@ export async function fetchAmazonPage(
         proxyUrl: proxies.length ? proxies[attempt % proxies.length] : undefined,
         template: scraperTemplateWithCountry,
       });
+      // ZenRows can occasionally return a tiny HTTP 200 provider/error page instead of Amazon HTML.
+      // Treat unusually small scraper responses as transient and retry rather than passing them to parsers.
+      if (scraperTemplateWithCountry && result.html.trim().length < 10_000) {
+        console.warn('[scraper] unusually small response; retrying', {
+          status: result.status,
+          htmlLength: result.html.length,
+          attempt: attempt + 1,
+          maxAttempts: attempts,
+        });
+        lastError = upstreamUnavailable('ZenRows returned an unexpectedly small response');
+        continue;
+      }
       if (isCaptchaPage(result.html) || result.status === 403 || result.status === 429) {
         lastError = upstreamBlocked(`Amazon returned a robot check or a ${result.status} response`);
         continue;
