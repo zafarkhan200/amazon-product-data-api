@@ -151,7 +151,7 @@ export const promoCodeInputSchema = z
 export const asinToGtinInputSchema = z
   .object({
     asin: asinSchema,
-    type: normalizedEnum(['EAN-13', 'UPC', 'ISBN'] as const).default('EAN-13'),
+    type: z.string().trim().toUpperCase().transform((value) => value.replace(/_/g, '-')).pipe(z.enum(['EAN-13', 'UPC', 'ISBN'])).default('EAN-13'),
     ...common,
   })
   .strict();
