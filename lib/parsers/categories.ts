@@ -25,6 +25,10 @@ const FALLBACK_CATEGORIES: Category[] = [
   { id: '3615391', name: 'Patio, Lawn & Garden' },
 ];
 
+export function getFallbackCategoryList(country: CountryConfig): CategoryListData {
+  return { categories: FALLBACK_CATEGORIES, country: country.code };
+}
+
 export function parseCategoryList(html: string, country: CountryConfig): CategoryListData {
   const $ = load(html);
   const parsed: Category[] = [];
