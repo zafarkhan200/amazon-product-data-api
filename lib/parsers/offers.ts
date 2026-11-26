@@ -1,7 +1,7 @@
 import { load } from 'cheerio';
 import type { CountryConfig } from '../countries.js';
 import type { Offer, OffersData, Product, ProductDetails } from '../types.js';
-import { clean, dedupeBy, firstAttr, firstText, parseCount, priceFrom } from './helpers.js';
+import { clean, dedupeBy, firstAttr, firstText, parseCount, parsePriceText, priceFrom } from './helpers.js';
 import { parseProductBase, parseProductDetails } from './product.js';
 
 export function parseOffers(
@@ -63,6 +63,31 @@ export function parseOffers(
       price = priceFrom(row, [selector], country.currency);
       if (price) break;
     }
+    // Fallback for AOD rows whose price is visible in text but not wrapped in
+    // the usual .a-price/.a-offscreen markup.
+    if (!price) {
+      const fallbackPatterns: Record<string, RegExp> = {
+        USD: /\$\s*\d[\d,]*(?:\.\d{2})?/,
+        CAD: /\$\s*\d[\d,]*(?:\.\d{2})?/,
+        AUD: /\$\s*\d[\d,]*(?:\.\d{2})?/,
+        MXN: /\$\s*\d[\d,]*(?:\.\d{2})?/,
+        GBP: /£\s*\d[\d,]*(?:\.\d{2})?/,
+        EUR: /\d[\d.,]*\s*€/,
+        INR: /₹\s*\d[\d,]*(?:\.\d{2})?/,
+        AED: /(?:AED|د\.?إ)\s*\d[\d,]*(?:\.\d{2})?/i,
+        SAR: /(?:SAR|ر\.?س)\s*\d[\d,]*(?:\.\d{2})?/i,
+        EGP: /(?:EGP|ج\.?م)\s*\d[\d,]*(?:\.\d{2})?/i,
+        JPY: /[¥￥]\s*\d[\d,]*/,
+        CNY: /(?:[¥￥]\s*\d[\d,]*|\d[\d,]*\s*元)/,
+        BRL: /R\$\s*\d[\d.,]*/,
+        TRY: /₺\s*\d[\d.,]*/,
+        SEK: /\d[\d.,]*\s*kr/i,
+        PLN: /\d[\d.,]*\s*zł/i,
+      };
+      const fallbackMatch = rowText.match(fallbackPatterns[country.currency] ?? /(?!) /);
+      if (fallbackMatch) price = parsePriceText(fallbackMatch[0], country.currency);
+    }
+
     const seller = firstText(row, [
       '#aod-offer-soldBy a',
       '#aod-offer-soldBy',
