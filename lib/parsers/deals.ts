@@ -16,7 +16,7 @@ import { parseProductCards, parseSearchResults } from './search.js';
 
 function dealIdFromHref(href: string | undefined): string | undefined {
   if (!href) return undefined;
-  const match = href.match(/\\/(?:deals|golden-deals)\\/([^/?#]+)/i);
+  const match = href.match(/\/(?:deals|golden-deals)\/([^/?#]+)/i);
   return match?.[1] ? decodeURIComponent(match[1]) : undefined;
 }
 
@@ -32,8 +32,8 @@ export function parseDeals(html: string, country: CountryConfig, page: number): 
     currentDealCards.each((_, element) => {
       const card = $(element);
       const itemId = card.attr('data-csa-c-item-id') ?? '';
-      const dealIdMatch = itemId.match(/amzn1\\.deal\\.([A-Za-z0-9_-]+)/i);
-      const asinMatch = itemId.match(/amzn1\\.asin\\.([A-Z0-9]{10})/i);
+      const dealIdMatch = itemId.match(/amzn1\.deal\.([A-Za-z0-9_-]+)/i);
+      const asinMatch = itemId.match(/amzn1\.asin\.([A-Z0-9]{10})/i);
       const dealId = dealIdMatch?.[1] ?? undefined;
       const asin = asinMatch?.[1]?.toUpperCase();
       if (!dealId || !asin) return;
@@ -69,14 +69,14 @@ export function parseDeals(html: string, country: CountryConfig, page: number): 
         badges: [firstText(card, ['[class*="badgeMessage"]', '[data-component="dui-badge"]']) ?? ''].filter(Boolean),
       };
 
-      const discountMatch = cardText.match(/(\\d{1,3})\\s*%\\s*off|-\\s*(\\d{1,3})\\s*%/i);
+      const discountMatch = cardText.match(/(\d{1,3})\s*%\s*off|-\s*(\d{1,3})\s*%/i);
       const deal = dealById.get(dealId) ?? {
         deal_id: clean(dealId),
         title: firstText(card, ['[class*="badgeMessage"]', 'h2', 'h3']) ?? title,
         type: /lightning/i.test(cardText) ? 'LIGHTNING_DEAL' : 'BEST_DEAL',
         discount: parseNumber(discountMatch?.[1] ?? discountMatch?.[2]),
         end_time: firstAttr(card, ['[data-end-time]'], 'data-end-time') ?? undefined,
-        claimed_percent: parseNumber(cardText.match(/(\\d{1,3})\\s*%\\s*claimed/i)?.[1]),
+        claimed_percent: parseNumber(cardText.match(/(\d{1,3})\s*%\s*claimed/i)?.[1]),
         photo: product.photo,
         url: product.url,
         sample_products: [],
@@ -104,8 +104,8 @@ export function parseDeals(html: string, country: CountryConfig, page: number): 
         card.attr('id') ??
         dealIdFromHref(href) ??
         `deal-${deals.length + 1}`;
-      const discountMatch = cardText.match(/(\\d{1,3})\\s*%\\s*off|-\\s*(\\d{1,3})\\s*%/i);
-      const claimedMatch = cardText.match(/(\\d{1,3})\\s*%\\s*claimed/i);
+      const discountMatch = cardText.match(/(\d{1,3})\s*%\s*off|-\s*(\d{1,3})\s*%/i);
+      const claimedMatch = cardText.match(/(\d{1,3})\s*%\s*claimed/i);
       const scoped = load(card.html() ?? '');
 
       deals.push({
