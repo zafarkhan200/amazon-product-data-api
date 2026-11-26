@@ -33,6 +33,7 @@ export function repairTextEncoding(value: string): string {
 
 export const clean = (value?: string | null): string =>
   repairTextEncoding(value ?? '')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
     .replace(/\u00a0/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
