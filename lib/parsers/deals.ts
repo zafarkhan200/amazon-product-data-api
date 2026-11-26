@@ -12,7 +12,7 @@ import {
   parsePriceText,
   parseRating,
 } from './helpers.js';
-import { parseProductCards, parseSearchResults } from './search.js';
+import { parseProductCards } from './search.js';
 
 function dealIdFromHref(href: string | undefined): string | undefined {
   if (!href) return undefined;
@@ -147,7 +147,7 @@ export function parseDealProducts(
   dealCards.each((_, element) => {
     const card = $(element);
     const itemId = card.attr('data-csa-c-item-id') ?? '';
-    const asin = itemId.match(/amzn1\\.asin\\.([A-Z0-9]{10})/i)?.[1]?.toUpperCase();
+    const asin = itemId.match(/amzn1\.asin\.([A-Z0-9]{10})/i)?.[1]?.toUpperCase();
     if (!asin) return;
 
     const href = firstAttr(card, ['a[href*="/dp/"]'], 'href');
