@@ -16,6 +16,16 @@ import {
   parseRating,
 } from './helpers.js';
 
+/** Repair common UTF-8 bytes incorrectly decoded as Latin-1/Windows-1252 in scraped titles. */
+function repairTitleEncoding(value: string): string {
+  if (!/[ÃÂâðï]/.test(value)) return value;
+  const repaired = Buffer.from(value, 'latin1').toString('utf8');
+  if (repaired.includes('\uFFFD')) return value;
+  const originalMarkers = (value.match(/[ÃÂâðï]/g) ?? []).length;
+  const repairedMarkers = (repaired.match(/[ÃÂâðï]/g) ?? []).length;
+  return repairedMarkers < originalMarkers ? repaired : value;
+}
+
 /** Parse product tiles from search-like pages (search, deals, GTIN lookup, coupons). */
 export function parseProductCards($: CheerioAPI, country: CountryConfig): Product[] {
   const products: Product[] = [];
@@ -78,7 +88,7 @@ export function parseProductCards($: CheerioAPI, country: CountryConfig): Produc
         firstAttr(card, ['img.s-image'], 'alt'),
         clean(card.find('img').first().attr('alt') ?? ''),
         firstText(card, ['h2', '.a-size-medium.a-color-base']),
-      ].map((value) => clean(value)).filter(Boolean);
+      ].map((value) => repairTitleEncoding(clean(value))).filter(Boolean);
       const genericTitles = new Set(['apple', 'amazon renewed', 'amazon', 'samsung', 'sony']);
       const title = titleCandidates.find((value) => value.length > 12 && !genericTitles.has(value.toLowerCase())) ??
         titleCandidates.find((value) => !genericTitles.has(value.toLowerCase()));
