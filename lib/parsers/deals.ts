@@ -137,6 +137,31 @@ export function parseDealProducts(
   dealId: string,
   page: number,
 ): DealProductsData {
+  const $ = load(html);
+  const asinNodes = $('[data-asin]').filter((_, element) =>
+    /^[A-Z0-9]{10}$/i.test($(element).attr('data-asin') ?? ''),
+  );
+  console.warn('[deal_products] markup diagnosis', {
+    htmlLength: html.length,
+    pageTitle: clean($('title').first().text()).slice(0, 120),
+    currentDealCardCount: $('[data-csa-c-item-type="deal"][data-csa-c-item-id]').length,
+    searchCardCount: $('[data-component-type="s-search-result"], div.s-result-item[data-asin]').length,
+    validAsinNodeCount: asinNodes.length,
+    productLinkCount: $('a[href*="/dp/"]').length,
+    titleNodeCount: $('h2, a[aria-label], img[alt]').length,
+    priceNodeCount: $('.a-price .a-offscreen').length,
+    samples: asinNodes.slice(0, 4).map((_, element) => {
+      const card = $(element);
+      return {
+        asin: card.attr('data-asin'),
+        tag: element.tagName,
+        className: card.attr('class')?.slice(0, 120),
+        title: firstText(card, ['h2', 'a[aria-label]', 'img[alt]']),
+        href: firstAttr(card, ['a[href*="/dp/"]'], 'href'),
+        price: firstText(card, ['.a-price .a-offscreen']),
+      };
+    }).get(),
+  });
   const result = parseSearchResults(html, country, dealId, page);
   return {
     deal_id: dealId,
