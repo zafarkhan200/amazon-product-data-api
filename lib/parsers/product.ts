@@ -17,7 +17,6 @@ import {
   priceFrom,
   rankFromText,
   requireTitle,
-  repairTextEncoding,
 } from './helpers.js';
 
 const PRICE_SELECTORS = [
@@ -52,7 +51,7 @@ export function parseProductBase($: CheerioAPI, country: CountryConfig, asinOver
   if (!asin) throw notFound('ASIN not found on the upstream page');
 
   const title = requireTitle(
-    repairTextEncoding(
+    clean(
       firstText($, ['#productTitle', 'h1.a-size-large', 'h1[class*="product-title"]']) ??
         (typeof ld.name === 'string' ? ld.name : undefined) ??
         '',
