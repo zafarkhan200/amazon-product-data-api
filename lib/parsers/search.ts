@@ -16,14 +16,27 @@ import {
   parseRating,
 } from './helpers.js';
 
-/** Repair common UTF-8 bytes incorrectly decoded as Latin-1/Windows-1252 in scraped titles. */
+/** Repair common UTF-8 bytes decoded as Windows-1252 in scraped titles. */
 function repairTitleEncoding(value: string): string {
   if (!/[ÃÂâðï]/.test(value)) return value;
-  const repaired = Buffer.from(value, 'latin1').toString('utf8');
+  const cp1252: Record<string, number> = {
+    '€': 0x80, '‚': 0x82, 'ƒ': 0x83, '„': 0x84, '…': 0x85, '†': 0x86,
+    '‡': 0x87, 'ˆ': 0x88, '‰': 0x89, 'Š': 0x8a, '‹': 0x8b, 'Œ': 0x8c,
+    'Ž': 0x8e, '‘': 0x91, '’': 0x92, '“': 0x93, '”': 0x94, '•': 0x95,
+    '–': 0x96, '—': 0x97, '˜': 0x98, '™': 0x99, 'š': 0x9a, '›': 0x9b,
+    'œ': 0x9c, 'ž': 0x9e, 'Ÿ': 0x9f,
+  };
+  const bytes = Array.from(value, (char) => {
+    const code = char.codePointAt(0)!;
+    return cp1252[char] ?? (code <= 0xff ? code : null);
+  });
+  if (bytes.some((byte) => byte === null)) return value;
+  const repaired = Buffer.from(bytes as number[]).toString('utf8');
   if (repaired.includes('\uFFFD')) return value;
-  const originalMarkers = (value.match(/[ÃÂâðï]/g) ?? []).length;
-  const repairedMarkers = (repaired.match(/[ÃÂâðï]/g) ?? []).length;
-  return repairedMarkers < originalMarkers ? repaired : value;
+  const markers = /[ÃÂâðï]/g;
+  return (repaired.match(markers) ?? []).length < (value.match(markers) ?? []).length
+    ? repaired
+    : value;
 }
 
 /** Parse product tiles from search-like pages (search, deals, GTIN lookup, coupons). */
