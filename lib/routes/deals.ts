@@ -38,16 +38,19 @@ dealsRoutes.get('/', (c) =>
 
       if (parsed.deals.length === 0) {
         const dealAttributeNodes = $('*')
-          .filter((_, element) =>
-            Object.entries(element.attribs ?? {}).some(([name, value]) =>
-              /^(id|class|data-testid|data-deal-id)$/i.test(name) && /deal/i.test(value),
-            ),
-          )
+          .filter((_, element) => {
+            const node = $(element);
+            return /deal/i.test(
+              [node.attr('id'), node.attr('class'), node.attr('data-testid'), node.attr('data-deal-id')]
+                .filter(Boolean)
+                .join(' '),
+            );
+          })
           .slice(0, 12)
           .map((_, element) => {
             const node = $(element);
             return {
-              tag: element.tagName,
+              tag: element.type,
               attributes: element.attribs,
               text: node.text().replace(/\s+/g, ' ').trim().slice(0, 220),
               html: node.toString().slice(0, 1400),
