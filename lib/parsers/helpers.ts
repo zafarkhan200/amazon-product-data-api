@@ -14,6 +14,19 @@ export function select(root: Selectable, selector: string): Cheerio<AnyNode> {
   return wrapNode(root as AnyNode).find(selector);
 }
 
+/** Decode UTF-8 byte sequences that were incorrectly preserved as Latin-1/control characters. */
+export function repairTextEncoding(value: string): string {
+  if (!/[ÃÂâðï]/.test(value)) return value;
+  const bytes = Array.from(value, (char) => {
+    const code = char.codePointAt(0)!;
+    return code <= 0xff ? code : null;
+  });
+  if (bytes.some((byte) => byte === null)) return value;
+  const repaired = Buffer.from(bytes as number[]).toString('utf8');
+  if (repaired.includes('\uFFFD')) return value;
+  return repaired.replace(/\u200b/g, '');
+}
+
 export const clean = (value?: string | null): string =>
   (value ?? '')
     .replace(/\u00a0/g, ' ')
