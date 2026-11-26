@@ -54,7 +54,8 @@ export function parseProductBase($: CheerioAPI, country: CountryConfig, asinOver
   const title = requireTitle(
     repairTextEncoding(
       firstText($, ['#productTitle', 'h1.a-size-large', 'h1[class*="product-title"]']) ??
-        (typeof ld.name === 'string' ? ld.name : undefined),
+        (typeof ld.name === 'string' ? ld.name : undefined) ??
+        '',
     ),
   );
 
