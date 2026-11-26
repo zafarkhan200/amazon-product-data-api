@@ -51,7 +51,12 @@ dealsRoutes.get('/', (c) =>
             const node = $(element);
             return {
               tag: element.type,
-              attributes: element.attribs,
+              attributes: {
+                id: node.attr('id') ?? null,
+                class: node.attr('class') ?? null,
+                'data-testid': node.attr('data-testid') ?? null,
+                'data-deal-id': node.attr('data-deal-id') ?? null,
+              },
               text: node.text().replace(/\s+/g, ' ').trim().slice(0, 220),
               html: node.toString().slice(0, 1400),
             };
