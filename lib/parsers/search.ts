@@ -23,8 +23,12 @@ export function parseProductCards($: CheerioAPI, country: CountryConfig): Produc
   $('[data-component-type="s-search-result"], div.s-result-item[data-asin], div[data-asin]').each(
     (_, element) => {
       const card = $(element);
+      // Sponsored or nested cards may carry the ASIN while the main title/image/link
+      // are rendered in a child tile. Try both the card and descendants.
       const href =
-        firstAttr(card, ['a.s-link-style', 'h2 a', 'a[href*="/dp/"]'], 'href') ?? undefined;
+        firstAttr(card, ['a.s-link-style', 'h2 a', 'a[href*="/dp/"]'], 'href') ??
+        firstAttr(card.find('a[href*="/dp/"]').first(), ['a[href*="/dp/"]'], 'href') ??
+        undefined;
       const asin = card.attr('data-asin')?.toUpperCase() || asinFromHref(href);
       if (!asin || !/^[A-Z0-9]{10}$/.test(asin)) return;
 
@@ -69,8 +73,10 @@ export function parseProductCards($: CheerioAPI, country: CountryConfig): Produc
       const image = firstAttr(card, ['img.s-image', 'img[src*="images-amazon"]'], 'src');
       const titleCandidates = [
         firstText(card, ['h2 a span', 'h2 span', 'a[href*="/dp/"] span.a-text-normal']),
+        clean(card.find('h2').first().text()),
         firstAttr(card, ['a[href*="/dp/"]'], 'title'),
         firstAttr(card, ['img.s-image'], 'alt'),
+        clean(card.find('img').first().attr('alt') ?? ''),
         firstText(card, ['h2', '.a-size-medium.a-color-base']),
       ].map((value) => clean(value)).filter(Boolean);
       const genericTitles = new Set(['apple', 'amazon renewed', 'amazon', 'samsung', 'sony']);
