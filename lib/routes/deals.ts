@@ -36,6 +36,44 @@ dealsRoutes.get('/', (c) =>
         hasCaptcha: /captcha|robot check|automated access|validateCaptcha/i.test(html.slice(0, 60000)),
       });
 
+      if (parsed.deals.length === 0) {
+        const dealAttributeNodes = $('*')
+          .filter((_, element) =>
+            Object.entries(element.attribs ?? {}).some(([name, value]) =>
+              /^(id|class|data-testid|data-deal-id)$/i.test(name) && /deal/i.test(value),
+            ),
+          )
+          .slice(0, 12)
+          .map((_, element) => {
+            const node = $(element);
+            return {
+              tag: element.tagName,
+              attributes: element.attribs,
+              text: node.text().replace(/\\s+/g, ' ').trim().slice(0, 220),
+              html: node.toString().slice(0, 1400),
+            };
+          });
+
+        const dealLinks = $('a[href*="/deal/"], a[href*="/deals/"], a[href*="/golden-deals/"], a[href*="/dp/"]')
+          .slice(0, 12)
+          .map((_, element) => {
+            const node = $(element);
+            return {
+              href: node.attr('href') ?? null,
+              text: node.text().replace(/\\s+/g, ' ').trim().slice(0, 180),
+              parentHtml: node.parent().parent().toString().slice(0, 1600),
+            };
+          });
+
+        console.info('[deals] markup samples for parser diagnosis', {
+          dealAttributeNodeCount: $('[id*="deal" i], [class*="deal" i], [data-testid*="deal" i], [data-deal-id]').length,
+          dealLinkCount: $('a[href*="/deal/"], a[href*="/deals/"], a[href*="/golden-deals/"]').length,
+          productLinkCount: $('a[href*="/dp/"]').length,
+          dealAttributeNodes,
+          dealLinks,
+        });
+      }
+
       return parsed;
     },
   }),
