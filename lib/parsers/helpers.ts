@@ -27,7 +27,12 @@ export function repairTextEncoding(value: string): string {
     return decoded.includes('\uFFFD') ? run : decoded;
   });
 
-  return repaired.replace(/[\u200B-\u200F\uFEFF\u061C]/g, '');
+  return repaired
+    .replace(/\u00e2\u0080\u0098/g, '\u2018')
+    .replace(/\u00e2\u0080\u0099/g, '\u2019')
+    .replace(/\u00e2\u0080\u009c/g, '\u201c')
+    .replace(/\u00e2\u0080\u009d/g, '\u201d')
+    .replace(/[\u200B-\u200F\uFEFF\u061C]/g, '');
 }
 
 
