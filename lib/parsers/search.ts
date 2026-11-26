@@ -14,30 +14,8 @@ import {
   parseCount,
   parsePriceText,
   parseRating,
+  repairTextEncoding,
 } from './helpers.js';
-
-/** Repair common UTF-8 bytes decoded as Windows-1252 in scraped titles. */
-function repairTitleEncoding(value: string): string {
-  if (!/[ÃÂâðï]/.test(value)) return value;
-  const cp1252: Record<string, number> = {
-    '€': 0x80, '‚': 0x82, 'ƒ': 0x83, '„': 0x84, '…': 0x85, '†': 0x86,
-    '‡': 0x87, 'ˆ': 0x88, '‰': 0x89, 'Š': 0x8a, '‹': 0x8b, 'Œ': 0x8c,
-    'Ž': 0x8e, '‘': 0x91, '’': 0x92, '“': 0x93, '”': 0x94, '•': 0x95,
-    '–': 0x96, '—': 0x97, '˜': 0x98, '™': 0x99, 'š': 0x9a, '›': 0x9b,
-    'œ': 0x9c, 'ž': 0x9e, 'Ÿ': 0x9f,
-  };
-  const bytes = Array.from(value, (char) => {
-    const code = char.codePointAt(0)!;
-    return cp1252[char] ?? (code <= 0xff ? code : null);
-  });
-  if (bytes.some((byte) => byte === null)) return value;
-  const repaired = Buffer.from(bytes as number[]).toString('utf8');
-  if (repaired.includes('\uFFFD')) return value;
-  const markers = /[ÃÂâðï]/g;
-  return (repaired.match(markers) ?? []).length < (value.match(markers) ?? []).length
-    ? repaired
-    : value;
-}
 
 /** Parse product tiles from search-like pages (search, deals, GTIN lookup, coupons). */
 export function parseProductCards($: CheerioAPI, country: CountryConfig): Product[] {
@@ -101,7 +79,7 @@ export function parseProductCards($: CheerioAPI, country: CountryConfig): Produc
         firstAttr(card, ['img.s-image'], 'alt'),
         clean(card.find('img').first().attr('alt') ?? ''),
         firstText(card, ['h2', '.a-size-medium.a-color-base']),
-      ].map((value) => repairTitleEncoding(clean(value))).filter(Boolean);
+      ].map((value) => repairTextEncoding(clean(value))).filter(Boolean);
       const genericTitles = new Set(['apple', 'amazon renewed', 'amazon', 'samsung', 'sony']);
       const title = titleCandidates.find((value) => value.length > 12 && !genericTitles.has(value.toLowerCase())) ??
         titleCandidates.find((value) => !genericTitles.has(value.toLowerCase()));
